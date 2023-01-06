@@ -1,0 +1,12 @@
+
+
+RANKX ( ALL ( DIM_ProductDetails[ProductTrademark] ),
+    CALCULATE ( SUM ( FACT_Sales[OrderAmount] ),
+        ALLEXCEPT (
+            DIM_Products,
+            DIM_ProductDetails[ProductSourceName],
+            DIM_ProductDetails[ProductTrademark]
+        ) ),
+    ,
+    DESC
+)
