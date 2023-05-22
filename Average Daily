@@ -1,0 +1,5 @@
+AverageDailyRevenue =
+AVERAGEX (
+    VALUES ( Fact_Sales[Дата] ),
+    CALCULATE ( SUM ( Fact_Sales[Выручка, դր] ) ) + 0
+)
