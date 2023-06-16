@@ -1,0 +1,20 @@
+Distance (m) = 
+VAR lat1 =
+    RADIANS ( 'Location Of Customers'[Latitute] )
+VAR lon1 =
+    RADIANS ( 'Location Of Customers'[Longitute] )
+VAR lat2 =
+    RADIANS ( 'Location Of Customers'[Clat] )
+VAR lon2 =
+    RADIANS ( 'Location Of Customers'[CLong] )
+VAR dlat = lat2 - lat1
+VAR dlon = lon2 - lon1
+VAR a =
+    SIN ( dlat / 2 ) ^ 2
+        + COS ( lat1 ) * COS ( lat2 )
+            * SIN ( dlon / 2 ) ^ 2
+VAR c =
+    2 * ASIN ( SQRT ( a ) )
+VAR radius = 6371000
+RETURN
+   IF(OR(ISBLANK('Location Of Customers'[Clat]) = TRUE(),'Location Of Customers'[Clat] = "0"),0, radius * c)
