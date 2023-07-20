@@ -1,0 +1,11 @@
+let
+    Source = Table.Combine({
+        Table.AddColumn(#"Alianta", "Country", each "Alianta"),
+        Table.AddColumn(#"Aromatni Mir", "Country", each "Aromatni Mir"),
+        Table.AddColumn(#"Belgia", "Country", each "Belgia"),
+        Table.AddColumn(#"Gas", "Type of fuel", each "Gas"), 
+        Table.AddColumn(#"Gasoline", "Type of fuel", each "Gasoline")
+    })
+in
+    Source
+
