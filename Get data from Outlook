@@ -1,0 +1,6 @@
+
+let
+    Source = Exchange.Contents("name.surname.@domain.com"),
+    Mail1 = Source{[Name="Mail"]}[Data]
+in
+    Mail1
