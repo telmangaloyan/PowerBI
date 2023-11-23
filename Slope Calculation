@@ -1,0 +1,30 @@
+SalesSlope = 
+VAR _tbl =
+    FILTER (
+        SUMMARIZE (
+            Fact_Sales,
+            Fact_Sales[OrderDate],
+            "DateKey", CONVERT ( FORMAT ( Fact_Sales[OrderDate], "YYYYMMDD" ), INTEGER ),
+            "Sales", [TotalQuantity]
+        ),
+        NOT ( ISBLANK ( [Sales] ) )
+    )
+VAR RowCount =
+    COUNTROWS ( _tbl )
+VAR Sum_XY =
+    SUMX ( _tbl, ( [DateKey] * [Sales] ) )
+VAR SUM_X2 =
+    SUMX ( _tbl, ( [DateKey] ^ 2 ) )
+VAR SUM_X =
+    SUMX ( _tbl, ( [DateKey] ) )
+VAR SUM_Y =
+    SUMX ( _tbl, ( [Sales] ) )
+RETURN
+    /*IF(ISBLANK(
+    DIVIDE(RowCount * Sum_XY - SUM_X * SUM_Y,
+            RowCount * SUM_X2 - SUM_X ^2)),
+            0,*/
+    DIVIDE (
+        RowCount * Sum_XY - SUM_X * SUM_Y,
+        RowCount * SUM_X2 - SUM_X ^ 2
+    )
