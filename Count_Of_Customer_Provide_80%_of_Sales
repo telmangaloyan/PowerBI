@@ -1,0 +1,28 @@
+Count_Of_Customer_Provide_80%_of_Sales = 
+
+VAR first_ =
+    SUMMARIZE (
+        DIM_Customers,
+        DIM_Customers[CustomerFullname],
+        "@Sales_Count", [TotalQuantity],
+        "@Sales_all", CALCULATE ( [TotalQuantity], ALL ( DIM_Customers ) )
+        
+    )
+VAR Fourth_ = 
+    ADDCOLUMNS(first_,"@Rank_",ROWNUMBER(first_,ORDERBY([@Sales_Count],DESC)))
+VAR second_ =
+    ADDCOLUMNS (
+        Fourth_,
+        "@Cum",
+            SUMX (
+                FILTER (
+                    Fourth_,
+                    [@Rank_] <= EARLIER ( [@Rank_] )
+                ),
+                [@Sales_Count]
+            )
+    )
+VAR third_ = ADDCOLUMNS(second_,"@percent",DIVIDE([@Cum],[@Sales_all]))    
+RETURN
+COUNTROWS(
+    FILTER(third_,[@percent] <=0.8))
