@@ -1,0 +1,18 @@
+Top10Sales_CustomerPercentage =
+VAR TotalSales =
+    CALCULATE ( [TotalQuantity] )
+VAR TopN_Sales_cust =
+    SUMX (
+        TOPN (
+            10,
+            SUMMARIZE (
+                DIM_Customers,
+                DIM_Customers[CustomerID],
+                "@sales", [TotalQuantity]
+            ),
+            [@sales], DESC
+        ),
+        [@sales]
+    )
+RETURN
+    DIVIDE ( TopN_Sales_cust, TotalSales, 0 )
