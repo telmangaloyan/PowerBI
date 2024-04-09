@@ -1,0 +1,56 @@
+Random_Sample = 
+VAR already_Sampled =
+    VALUES ( Sampled[Index] )
+VAR table_for_random =
+    ADDCOLUMNS (
+        FILTER (
+            Form_Data_Paper,
+            NOT [Tax number]
+                IN already_Sampled
+                    && NOT ISBLANK ( [Phone number in format (0509999999)] )
+                        && LEN ( [Phone number in format (0509999999)] ) = 15
+                        && LEN ( Form_Data_Paper[Tax number] ) = 10
+        ),
+        "@SampSize",
+            CALCULATE (
+                [Settlement SampleSize],
+                ALLEXCEPT ( Form_Data_Paper, Form_Data_Paper[Settlement_Eng] )
+            )
+    )
+VAR RandomizedTable =
+    ADDCOLUMNS ( table_for_random, "RandomNumber", RAND () )
+VAR SampleSize = [Settlement SampleSize]
+VAR Top_N_Per_Settlement =
+    ADDCOLUMNS (
+        RandomizedTable,
+        "Rank",
+            RANKX (
+                FILTER ( RandomizedTable, [Settlement_Eng] = EARLIER ( [Settlement_Eng] ) ),
+                [RandomNumber],
+                ,
+                ASC
+            )
+    )
+VAR Top_N =
+    TOPN ( SampleSize, RandomizedTable, [RandomNumber] )
+VAR Filteredtop_n =
+    FILTER (
+        ADDCOLUMNS ( Top_N_Per_Settlement, "@Diff", [@SampSize] - [Rank] ),
+        [@SampSize] >= [Rank]
+    )
+RETURN
+    TOCSV (
+        SELECTCOLUMNS (
+            Filteredtop_n,
+            "FullName", [FullName],
+            "Settlement", [Settlement_Eng],
+            "@Phone", [Phone number in format (0509999999)],
+            "@Oblast", [Oblast_Eng],
+            "@Index", [Index],
+            "@SampleSize", [@SampSize],
+            "@Rank", [Rank]
+        ),
+        -1,
+        ",",
+        TRUE
+    )
